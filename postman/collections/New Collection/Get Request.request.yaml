@@ -1,0 +1,5 @@
+$kind: http-request
+name: Get Request
+url: http://localhost:3000/api/books
+method: GET
+order: 1772736327351

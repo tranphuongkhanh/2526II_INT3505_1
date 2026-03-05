@@ -1,0 +1,4 @@
+$kind: http-request
+url: http://localhost:3000/api/books/3
+method: DELETE
+order: 4496719427565725

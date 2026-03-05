@@ -1,0 +1,16 @@
+$kind: http-request
+name: Post request
+url: http://localhost:3000/api/books
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"title\": \"Clean Code\",\r
+
+    \  \"author\": \"Robert C. Martin\",\r
+
+    \  \"status\": \"available\"\r
+
+    }"
+order: 2109675799133548

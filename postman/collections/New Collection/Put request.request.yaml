@@ -1,0 +1,15 @@
+$kind: http-request
+url: http://localhost:3000/api/books/1
+method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \  \"title\": \"Harry Potter 1\",\r
+
+    \  \"author\": \"J.K. Rowling\",\r
+
+    \  \"status\": \"borrowed\"\r
+
+    }"
+order: 4192599616079491
