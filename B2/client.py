@@ -1,6 +1,6 @@
 import requests
 
-base = "http://127.0.0.1:5000"
+base = "http://127.0.0.1:5000/books"
 
 book = {
     "id": 1,
@@ -9,8 +9,8 @@ book = {
     "status": "available"
 }
 
-print(requests.post(base+"/add_book", json=book).json())
-print(requests.get(base+"/get_books").json())
+print(requests.post(base, json=book).json())
+print(requests.get(base).json())
 
 update = {
     "id": 1,
@@ -19,8 +19,8 @@ update = {
     "status": "available"
 }
 
-print(requests.put(base+"/update_book", json=update).json())
+print(requests.put(base+"/1", json=update).json())
 
-print(requests.patch(base+"/patch_book", json={"id":1,"status":"borrowed"}).json())
+print(requests.patch(base+"/1", json={"id":1,"status":"borrowed"}).json())
 
-print(requests.delete(base+"/delete_book", json={"id":1}).json())
+print(requests.delete(base+"/1", json={"id":1}).json())
