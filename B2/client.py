@@ -10,7 +10,10 @@ book = {
 }
 
 print(requests.post(base, json=book).json())
-print(requests.get(base).json())
+
+r = requests.get(base)
+print("CACHE HEADER:", r.headers.get("Cache-Control"))
+print(r.json())
 
 update = {
     "id": 1,

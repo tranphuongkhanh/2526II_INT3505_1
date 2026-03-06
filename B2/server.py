@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, make_response, request, jsonify
 
 app = Flask(__name__)
 
@@ -12,7 +12,9 @@ def add_book():
 
 @app.route("/books", methods=["GET"])
 def get_books():
-    return jsonify(books)
+    response = make_response(jsonify(books))
+    response.headers["Cache-Control"] = "public, max-age=60"
+    return response
 
 @app.route("/books/<int:id>", methods=["PUT"])
 def update_book(id):
