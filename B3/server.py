@@ -8,26 +8,23 @@ books = [
     {"bookId": 3, "bookName": "Atomic Habits",  "auth": "James Clear",   "stat": "available"},
 ]
  
-@app.get("/getBooks")
+@app.get("/books") #lowercase
 def get_all_books():
     return jsonify(books)
  
-@app.get("/GetBookById")
-def get_book_by_id():
-    book_id = request.args.get("bookId", type=int)
-    if book_id is None:
-        return jsonify({"err": "bookId is required"}), 400
+@app.get("/books/<int:book_id>") #lowercase
+def get_book_by_id(book_id):
     book = next((b for b in books if b["bookId"] == book_id), None)
     if not book:       
         return jsonify({"err": "not found"}), 404
     return jsonify(book)
 
-@app.get("/books/borrowed_books")
+@app.get("/books/borrowed-books") #hyphens
 def get_borrowed():
     result = [b for b in books if b["stat"] == "borrowed"]
     return jsonify(result)
  
-@app.post("/createNewBook")
+@app.post("/books") #lowercase, plural
 def create_book():
     d = request.json or {}
     book = {
@@ -39,7 +36,7 @@ def create_book():
     books.append(book)
     return jsonify(book), 201
 
-@app.delete("/book/<int:book_id>")
+@app.delete("/books/<int:book_id>") #plural
 def delete_book(book_id):
     book = next((b for b in books if b["bookId"] == book_id), None)
     if not book:
