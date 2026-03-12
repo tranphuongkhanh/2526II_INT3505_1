@@ -17,11 +17,20 @@ def err(code, message, status_code):
     body = {"error": {"code": code, "message": message}}
     return jsonify(body), status_code
  
-@app.get("/books") #lowercase
+@app.get("/v1/books") #lowercase
 def get_all_books():
     return ok(books)
+
+@app.get("/v2/books")
+def get_all_books_v2():
+    # Phiên bản mới trả thêm thông tin tổng số sách
+    data = {
+        "total": len(books),
+        "items": books
+    }
+    return ok(data)
  
-@app.get("/books/<int:book_id>") #lowercase
+@app.get("/v1/books/<int:book_id>") #lowercase
 def get_book_by_id(book_id):
     book = next((b for b in books if b["id"] == book_id), None)
     if not book:       
@@ -29,12 +38,12 @@ def get_book_by_id(book_id):
         return err("NOT_FOUND", f"Book with ID {book_id} not found", 404)
     return ok(book)
 
-@app.get("/books/borrowed-books") #hyphens
+@app.get("/v1/books/borrowed-books") #hyphens
 def get_borrowed():
     result = [b for b in books if b["status"] == "borrowed"]
     return ok(result)
  
-@app.post("/books") #lowercase, plural
+@app.post("/v1/books") #lowercase, plural
 def create_book():
     d = request.json or {}
     
@@ -56,7 +65,7 @@ def create_book():
     books.append(book)
     return ok(book, status_code=201)
 
-@app.delete("/books/<int:book_id>") #plural
+@app.delete("/v1/books/<int:book_id>") #plural
 def delete_book(book_id):
     book = next((b for b in books if b["id"] == book_id), None)
     if not book:
