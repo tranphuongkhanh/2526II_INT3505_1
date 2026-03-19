@@ -1,0 +1,129 @@
+openapi: 3.0.0
+
+info:
+  title: Book Management API
+  description: API quản lý sách cho phép lấy thông tin sách, lấy sách theo ID, thêm sách mới, cập nhật và xóa sách.
+  version: 1.0.0
+
+paths:
+  /books:
+    get:
+      summary: Lấy danh sách tất cả sách
+      responses:
+        '200':
+          description: Lấy sách thành công
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+    post:
+      summary: Thêm sách mới
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+      responses:
+        '201':
+          description: Sách được tạo thành công
+
+  /books/{id}:
+    get:
+      summary: Lấy thông tin sách theo ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lấy sách thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '404':
+          description: Không tìm thấy sách
+    put:
+      summary: Cập nhật thông tin sách theo ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+      responses:
+        '200':
+          description: Cập nhật thành công
+        '404':
+          description: Không tìm thấy sách
+    patch:
+      summary: Cập nhật trạng thái sách theo ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookStatusUpdate'
+      responses:
+        '200':
+          description: Cập nhật thành công
+        '404':
+          description: Không tìm thấy sách
+    delete:
+      summary: Xóa sách theo ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Xóa thành công
+        '404':
+          description: Không tìm thấy sách
+
+components:
+  schemas:
+    Book:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        author:
+          type: string
+        status:
+          type: string
+          enum: [available, borrowed]
+      required:
+        - title
+        - author
+        - status
+    BookStatusUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [available, borrowed]
+      required:
+        - status
+
