@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, make_response
 from flask_swagger_ui import get_swaggerui_blueprint
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../static')
 
 SWAGGER_URL = '/docs'
 API_URL = '/static/book-api.yaml'
