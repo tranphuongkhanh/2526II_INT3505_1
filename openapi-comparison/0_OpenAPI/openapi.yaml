@@ -46,13 +46,13 @@ paths:
         '400':
           $ref: '#/components/responses/BadRequest'
 
-  /books/{id}:
+  /books/{bookId}:
     get:
       tags:
         - Books
       summary: Lấy thông tin sách theo ID
       parameters:
-        - name: id
+        - name: bookId
           in: path
           required: true
           schema:
@@ -71,7 +71,7 @@ paths:
         - Books
       summary: Cập nhật thông tin sách theo ID
       parameters:
-        - name: id
+        - name: bookId
           in: path
           required: true
           schema:
@@ -94,7 +94,7 @@ paths:
         - Books
       summary: Xóa sách theo ID
       parameters:
-        - name: id
+        - name: bookId
           in: path
           required: true
           schema:

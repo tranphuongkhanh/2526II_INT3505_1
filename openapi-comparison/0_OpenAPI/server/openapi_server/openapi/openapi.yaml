@@ -1,0 +1,277 @@
+openapi: 3.0.0
+info:
+  description: "API quản lý sách cho phép lấy thông tin sách, lấy sách theo ID, thê\
+    m sách mới, cập nhật và xóa sách."
+  title: Book Management API
+  version: 1.0.0
+servers:
+- description: Local development server
+  url: http://127.0.0.1:5000
+- description: Production server
+  url: https://2526-ii-int-3505-1-jqnb.vercel.app
+tags:
+- description: Các thao tác quản lý sách
+  name: Books
+paths:
+  /books:
+    get:
+      operationId: books_get
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Book"
+                type: array
+          description: Lấy sách thành công
+      summary: Lấy danh sách tất cả sách
+      tags:
+      - Books
+      x-openapi-router-controller: openapi_server.controllers.books_controller
+    post:
+      operationId: books_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookInput"
+        required: true
+      responses:
+        "201":
+          description: Sách được tạo thành công
+        "400":
+          content:
+            application/json:
+              example:
+                success: false
+                message: Dữ liệu không hợp lệ
+                errors:
+                - status phải là 'available' hoặc 'borrowed'
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Dữ liệu đầu vào không hợp lệ
+      summary: Thêm sách mới
+      tags:
+      - Books
+      x-openapi-router-controller: openapi_server.controllers.books_controller
+  /books/{bookId}:
+    delete:
+      operationId: books_book_id_delete
+      parameters:
+      - explode: false
+        in: path
+        name: bookId
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "204":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/_books__bookId__delete_204_response"
+          description: Xóa thành công
+        "404":
+          content:
+            application/json:
+              example:
+                success: false
+                message: Không tìm thấy sách với ID này
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Không tìm thấy sách
+      summary: Xóa sách theo ID
+      tags:
+      - Books
+      x-openapi-router-controller: openapi_server.controllers.books_controller
+    get:
+      operationId: books_book_id_get
+      parameters:
+      - explode: false
+        in: path
+        name: bookId
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+          description: Lấy sách thành công
+        "404":
+          content:
+            application/json:
+              example:
+                success: false
+                message: Không tìm thấy sách với ID này
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Không tìm thấy sách
+      summary: Lấy thông tin sách theo ID
+      tags:
+      - Books
+      x-openapi-router-controller: openapi_server.controllers.books_controller
+    put:
+      operationId: books_book_id_put
+      parameters:
+      - explode: false
+        in: path
+        name: bookId
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookInput"
+        required: true
+      responses:
+        "200":
+          description: Cập nhật thành công
+        "404":
+          content:
+            application/json:
+              example:
+                success: false
+                message: Không tìm thấy sách với ID này
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Không tìm thấy sách
+        "400":
+          content:
+            application/json:
+              example:
+                success: false
+                message: Dữ liệu không hợp lệ
+                errors:
+                - status phải là 'available' hoặc 'borrowed'
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Dữ liệu đầu vào không hợp lệ
+      summary: Cập nhật thông tin sách theo ID
+      tags:
+      - Books
+      x-openapi-router-controller: openapi_server.controllers.books_controller
+components:
+  responses:
+    BadRequest:
+      content:
+        application/json:
+          example:
+            success: false
+            message: Dữ liệu không hợp lệ
+            errors:
+            - status phải là 'available' hoặc 'borrowed'
+          schema:
+            $ref: "#/components/schemas/Error"
+      description: Dữ liệu đầu vào không hợp lệ
+    NotFound:
+      content:
+        application/json:
+          example:
+            success: false
+            message: Không tìm thấy sách với ID này
+          schema:
+            $ref: "#/components/schemas/Error"
+      description: Không tìm thấy sách
+  schemas:
+    Book:
+      example:
+        author: author
+        id: 0
+        title: title
+        status: available
+      properties:
+        id:
+          title: id
+          type: integer
+        title:
+          title: title
+          type: string
+        author:
+          title: author
+          type: string
+        status:
+          enum:
+          - available
+          - borrowed
+          title: status
+          type: string
+      required:
+      - author
+      - status
+      - title
+      title: Book
+      type: object
+    BookInput:
+      example:
+        author: author
+        title: title
+        status: available
+      properties:
+        title:
+          title: title
+          type: string
+        author:
+          title: author
+          type: string
+        status:
+          enum:
+          - available
+          - borrowed
+          title: status
+          type: string
+      required:
+      - author
+      - status
+      - title
+      title: BookInput
+      type: object
+    Error:
+      example:
+        success: false
+        message: Đã xảy ra lỗi
+        errors:
+        - title không được để trống
+        - isbn không hợp lệ
+      properties:
+        success:
+          example: false
+          title: success
+          type: boolean
+        message:
+          example: Đã xảy ra lỗi
+          title: message
+          type: string
+        errors:
+          example:
+          - title không được để trống
+          - isbn không hợp lệ
+          items:
+            type: string
+          title: errors
+          type: array
+      title: Error
+      type: object
+    _books__bookId__delete_204_response:
+      example:
+        success: true
+        message: Xóa thành công
+      properties:
+        success:
+          example: true
+          title: success
+          type: boolean
+        message:
+          example: Xóa thành công
+          title: message
+          type: string
+      title: _books__bookId__delete_204_response
+      type: object
