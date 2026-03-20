@@ -1,4 +1,4 @@
 # OpenAPI demo
 ## Cách chạy
-aglio -i api.apib -s -o
+npm install -g aglio
 aglio -i openapi-comparison/1_APIBlueprint/apiblueprint.apib -s -o
