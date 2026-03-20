@@ -4,7 +4,7 @@ from flask_swagger_ui import get_swaggerui_blueprint
 app = Flask(__name__, static_folder='../static')
 
 SWAGGER_URL = '/docs'
-API_URL = '/static/book-api.yaml'
+API_URL = 'https://raw.githubusercontent.com/tranphuongkhanh/2526II_INT3505_1/refs/heads/main/B4/static/book-api.yaml'
 
 swaggerui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,
