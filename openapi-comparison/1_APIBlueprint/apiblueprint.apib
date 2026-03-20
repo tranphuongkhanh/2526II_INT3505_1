@@ -1,0 +1,102 @@
+FORMAT: 1A
+HOST: http://127.0.0.1:5000
+
+# Book Management API
+API quản lý sách cho phép lấy thông tin sách, lấy sách theo ID, thêm sách mới, cập nhật và xóa sách.
+
+# Group Books
+
+## Books Collection [/books]
+
+### Lấy danh sách tất cả sách [GET]
+
++ Response 200 (application/json)
+    + Attributes (array[Book])
+
+---
+
+### Thêm sách mới [POST]
+
++ Request (application/json)
+    + Attributes (BookInput)
+
++ Response 201
+
++ Response 400 (application/json)
+    + Attributes (Error)
+
+---
+
+## Book [/books/{id}]
+
++ Parameters
+    + id: 1 (number, required) - ID của sách
+
+---
+
+### Lấy thông tin sách theo ID [GET]
+
++ Response 200 (application/json)
+    + Attributes (Book)
+
++ Response 404 (application/json)
+    + Attributes (Error)
+
+---
+
+### Cập nhật thông tin sách theo ID [PUT]
+
++ Request (application/json)
+    + Attributes (BookInput)
+
++ Response 200
+
++ Response 400 (application/json)
+    + Attributes (Error)
+
++ Response 404 (application/json)
+    + Attributes (Error)
+
+---
+
+### Xóa sách theo ID [DELETE]
+
++ Response 204 (application/json)
+    + Attributes
+        + success: true (boolean)
+        + message: Xóa thành công (string)
+
++ Response 404 (application/json)
+    + Attributes (Error)
+
+---
+
+# Data Structures
+
+## Book (object)
++ id: 1 (number)
++ title: Clean Code (string)
++ author: Robert Martin (string)
++ status: available (enum[string])
+    + Members
+        + available
+        + borrowed
+
+---
+
+## BookInput (object)
++ title: Clean Code (string, required)
++ author: Robert Martin (string, required)
++ status: available (enum[string], required)
+    + Members
+        + available
+        + borrowed
+
+---
+
+## Error (object)
++ success: false (boolean)
++ message: Đã xảy ra lỗi (string)
++ errors (array[string])
+    + title không được để trống
+    + isbn không hợp lệ
