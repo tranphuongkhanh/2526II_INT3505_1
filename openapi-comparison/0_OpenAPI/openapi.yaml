@@ -1,0 +1,185 @@
+openapi: 3.0.0
+
+info:
+  title: Book Management API
+  description: API quản lý sách cho phép lấy thông tin sách, lấy sách theo ID, thêm sách mới, cập nhật và xóa sách.
+  version: 1.0.0
+
+servers:
+  - url: http://127.0.0.1:5000
+    description: Local development server
+  - url: https://2526-ii-int-3505-1-jqnb.vercel.app
+    description: Production server
+
+tags:
+  - name: Books
+    description: Các thao tác quản lý sách
+
+paths:
+  /books:
+    get:
+      tags:
+        - Books
+      summary: Lấy danh sách tất cả sách
+      responses:
+        '200':
+          description: Lấy sách thành công
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+    post:
+      tags:
+        - Books
+      summary: Thêm sách mới
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookInput'
+      responses:
+        '201':
+          description: Sách được tạo thành công
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /books/{id}:
+    get:
+      tags:
+        - Books
+      summary: Lấy thông tin sách theo ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lấy sách thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - Books
+      summary: Cập nhật thông tin sách theo ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookInput'
+      responses:
+        '200':
+          description: Cập nhật thành công
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    delete:
+      tags:
+        - Books
+      summary: Xóa sách theo ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Xóa thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Xóa thành công"
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  schemas:
+    Book:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        author:
+          type: string
+        status:
+          type: string
+          enum: [available, borrowed]
+      required:
+        - title
+        - author
+        - status
+    BookInput:
+      type: object
+      properties:
+        title:
+          type: string
+        author:
+          type: string
+        status:
+          type: string
+          enum: [available, borrowed]
+      required:
+        - title
+        - author
+        - status
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: "Đã xảy ra lỗi"
+        errors:
+          type: array
+          items:
+            type: string
+          example: ["title không được để trống", "isbn không hợp lệ"]
+  responses:
+    BadRequest:
+      description: Dữ liệu đầu vào không hợp lệ
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            success: false
+            message: "Dữ liệu không hợp lệ"
+            errors: ["status phải là 'available' hoặc 'borrowed'"]
+    NotFound:
+      description: Không tìm thấy sách
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            message: "Không tìm thấy sách với ID này"
+
