@@ -1,0 +1,123 @@
+#%RAML 1.0
+title: Book Management API
+version: 1.0.0
+description: API quản lý sách cho phép lấy thông tin sách, lấy sách theo ID, thêm sách mới, cập nhật và xóa sách.
+baseUri: http://127.0.0.1:5000
+
+mediaType: application/json
+
+types:
+  Book:
+    type: object
+    properties:
+      id?: integer
+      title: string
+      author: string
+      status:
+        type: string
+        enum: [available, borrowed]
+
+  BookInput:
+    type: object
+    properties:
+      title: string
+      author: string
+      status:
+        type: string
+        enum: [available, borrowed]
+
+  Error:
+    type: object
+    properties:
+      success: boolean
+      message: string
+      errors?: string[]
+
+/books:
+  get:
+    description: Lấy danh sách tất cả sách
+    responses:
+      200:
+        body:
+          application/json:
+            type: Book[]
+
+  post:
+    description: Thêm sách mới
+    body:
+      application/json:
+        type: BookInput
+    responses:
+      201:
+        description: Sách được tạo thành công
+      400:
+        description: Dữ liệu đầu vào không hợp lệ
+        body:
+          application/json:
+            type: Error
+            example:
+              success: false
+              message: "Dữ liệu không hợp lệ"
+              errors:
+                - "status phải là 'available' hoặc 'borrowed'"
+
+/books/{id}:
+  uriParameters:
+    id:
+      type: integer
+      required: true
+      description: ID của sách
+
+  get:
+    description: Lấy thông tin sách theo ID
+    responses:
+      200:
+        body:
+          application/json:
+            type: Book
+      404:
+        description: Không tìm thấy sách
+        body:
+          application/json:
+            type: Error
+            example:
+              success: false
+              message: "Không tìm thấy sách với ID này"
+
+  put:
+    description: Cập nhật thông tin sách theo ID
+    body:
+      application/json:
+        type: BookInput
+    responses:
+      200:
+        description: Cập nhật thành công
+      400:
+        description: Dữ liệu đầu vào không hợp lệ
+        body:
+          application/json:
+            type: Error
+      404:
+        description: Không tìm thấy sách
+        body:
+          application/json:
+            type: Error
+
+  delete:
+    description: Xóa sách theo ID
+    responses:
+      204:
+        body:
+          application/json:
+            type: object
+            properties:
+              success: boolean
+              message: string
+            example:
+              success: true
+              message: "Xóa thành công"
+      404:
+        description: Không tìm thấy sách
+        body:
+          application/json:
+            type: Error
