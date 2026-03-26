@@ -6,8 +6,21 @@ from app.models import Reader, Book, BorrowRecord
 # Reader API Endpoints
 
 @app.route('/api/readers', methods=['GET'])
-def get_all_readers():
-    readers = Reader.query.all()
+def get_readers():
+    name = request.args.get('name', type=str)
+    email = request.args.get('email', type=str)
+    phone = request.args.get('phone', type=str)
+
+    query = Reader.query
+    
+    if name:
+        query = query.filter(Reader.name.ilike(f'%{name}%'))
+    if email:
+        query = query.filter(Reader.email.ilike(f'%{email}%'))
+    if phone:
+        query = query.filter(Reader.phone.ilike(f'%{phone}%'))
+        
+    readers = query.all()
     return jsonify([reader.to_dict() for reader in readers]), 200
 
 @app.route('/api/readers/<int:id>', methods=['GET'])
@@ -56,8 +69,21 @@ def delete_reader(id):
 # Book API Endpoints
 
 @app.route('/api/books', methods=['GET'])
-def get_all_books():
-    books = Book.query.all()
+def get_books():
+    isbn = request.args.get('isbn', type=str)
+    title = request.args.get('title', type=str)
+    author = request.args.get('author', type=str)
+    
+    query = Book.query
+    
+    if isbn:
+        query = query.filter(Book.isbn.ilike(f'%{isbn}%'))
+    if title:
+        query = query.filter(Book.title.ilike(f'%{title}%'))
+    if author:
+        query = query.filter(Book.author.ilike(f'%{author}%'))
+        
+    books = query.all()
     return jsonify([book.to_dict() for book in books]), 200
 
 @app.route('/api/books/<int:id>', methods=['GET'])
@@ -110,8 +136,21 @@ def delete_book(id):
 # BorrowRecord API Endpoints
 
 @app.route('/api/borrow-records', methods=['GET'])
-def get_all_records():
-    records = BorrowRecord.query.all()
+def get_records():
+    status = request.args.get('status', type=str)
+    reader_id = request.args.get('reader_id', type=int)
+    book_id = request.args.get('book_id', type=int)
+    
+    query = BorrowRecord.query
+    
+    if status:
+        query = query.filter(BorrowRecord.status == status)
+    if reader_id:
+        query = query.filter(BorrowRecord.reader_id == reader_id)
+    if book_id:
+        query = query.filter(BorrowRecord.book_id == book_id)
+        
+    records = query.all()
     return jsonify([record.to_dict() for record in records]), 200
 
 @app.route('/api/borrow-records/<int:id>', methods=['GET'])
