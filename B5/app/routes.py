@@ -7,6 +7,9 @@ from app.models import Reader, Book, BorrowRecord
 
 @app.route('/api/readers', methods=['GET'])
 def get_readers():
+    offset = request.args.get('offset', 0, type=int)
+    limit = request.args.get('limit', 10, type=int)
+
     name = request.args.get('name', type=str)
     email = request.args.get('email', type=str)
     phone = request.args.get('phone', type=str)
@@ -20,8 +23,16 @@ def get_readers():
     if phone:
         query = query.filter(Reader.phone.ilike(f'%{phone}%'))
         
-    readers = query.all()
-    return jsonify([reader.to_dict() for reader in readers]), 200
+    total = query.count()
+    
+    readers = query.offset(offset).limit(limit).all()
+    
+    return jsonify({
+        "total": total,
+        "offset": offset,
+        "limit": limit,
+        "data": [reader.to_dict() for reader in readers]
+    }), 200
 
 @app.route('/api/readers/<int:id>', methods=['GET'])
 def get_reader_by_id(id):
@@ -70,6 +81,9 @@ def delete_reader(id):
 
 @app.route('/api/books', methods=['GET'])
 def get_books():
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+
     isbn = request.args.get('isbn', type=str)
     title = request.args.get('title', type=str)
     author = request.args.get('author', type=str)
@@ -83,8 +97,16 @@ def get_books():
     if author:
         query = query.filter(Book.author.ilike(f'%{author}%'))
         
-    books = query.all()
-    return jsonify([book.to_dict() for book in books]), 200
+    paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+
+    return jsonify({
+        "total_items": paginated.total,
+        "total_pages": paginated.pages,
+        "current_page": paginated.page,
+        "per_page": paginated.per_page,
+        "has_next": paginated.has_next,
+        "data": [book.to_dict() for book in paginated.items]
+    }), 200
 
 @app.route('/api/books/<int:id>', methods=['GET'])
 def get_book_by_id(id):
@@ -137,6 +159,9 @@ def delete_book(id):
 
 @app.route('/api/borrow-records', methods=['GET'])
 def get_records():
+    limit = request.args.get('limit', 10, type=int)
+    cursor = request.args.get('cursor', type=int)
+
     status = request.args.get('status', type=str)
     reader_id = request.args.get('reader_id', type=int)
     book_id = request.args.get('book_id', type=int)
@@ -150,8 +175,24 @@ def get_records():
     if book_id:
         query = query.filter(BorrowRecord.book_id == book_id)
         
-    records = query.all()
-    return jsonify([record.to_dict() for record in records]), 200
+    if cursor:
+        query = query.filter(BorrowRecord.id > cursor)
+        
+    records = query.order_by(BorrowRecord.id.asc()).limit(limit + 1).all()
+    
+    has_next = len(records) > limit
+    if has_next:
+        records = records[:-1]
+        next_cursor = records[-1].id
+    else:
+        next_cursor = None
+        
+    return jsonify({
+        "data": [record.to_dict() for record in records],
+        "next_cursor": next_cursor,
+        "limit": limit,
+        "has_next": has_next
+    }), 200
 
 @app.route('/api/borrow-records/<int:id>', methods=['GET'])
 def get_record_by_id(id):
