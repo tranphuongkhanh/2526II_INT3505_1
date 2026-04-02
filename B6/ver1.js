@@ -20,6 +20,27 @@ let books = [
 let refreshTokens = [];
 let revokedJtis = [];
 
+const verifyToken = (req, res, next) => {
+    const token = req.headers['authorization']?.split(' ')[1];
+    if (!token) return res.status(401).json({ message: 'Thiếu Token' });
+    try {
+        const decoded = jwt.verify(
+            token, 
+            SECRET_KEY, 
+            {algorithms: ['HS256']}
+        );
+
+        if (revokedJtis.includes(decoded.jti)) {
+            return res.status(401).json({ message: 'Token này đã bị thu hồi (Bạn đã đăng xuất trước đó)' });
+        }
+    
+        req.user = decoded;
+        next();
+    } catch (err) {
+        return res.status(403).json({message: 'Token không hợp lệ hoặc đã hết hạn.'});
+    }
+};
+
 app.post('/api/login', (req, res) => {
     const user = users.find(u => u.username === req.body.username && u.password === req.body.password);
     if (!user) return res.status(401).json({ message: 'Sai thông tin' });
@@ -76,27 +97,6 @@ app.post('/api/logout', (req, res) => {
     
     res.json({ message: 'Đăng xuất thành công, Refresh Token đã bị vô hiệu hóa!' });
 });
-
-const verifyToken = (req, res, next) => {
-    const token = req.headers['authorization']?.split(' ')[1];
-    if (!token) return res.status(401).json({ message: 'Thiếu Token' });
-    try {
-        const decoded = jwt.verify(
-            token, 
-            SECRET_KEY, 
-            {algorithms: ['HS256']}
-        );
-
-        if (revokedJtis.includes(decoded.jti)) {
-            return res.status(401).json({ message: 'Token này đã bị thu hồi (Bạn đã đăng xuất trước đó)' });
-        }
-    
-        req.user = decoded;
-        next();
-    } catch (err) {
-        return res.status(403).json({message: 'Token không hợp lệ hoặc đã hết hạn.'});
-    }
-};
 
 app.use('/api/books', verifyToken);
 
