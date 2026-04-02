@@ -3,6 +3,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const crypto = require('crypto');
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
@@ -18,19 +19,22 @@ let books = [
     { id: 2, title: 'The Pragmatic Programmer', author: 'Andrew Hunt', status: 'borrowed' }
 ];
 let refreshTokens = [];
+let revokedJtis = [];
 
 app.post('/api/login', (req, res) => {
     const user = users.find(u => u.username === req.body.username && u.password === req.body.password);
     if (!user) return res.status(401).json({ message: 'Sai thông tin' });
 
+    const uniqueTokenId = crypto.randomUUID();
+
     const accessToken = jwt.sign(
-        { id: user.id, username: user.username, role: user.role }, 
+        { id: user.id, username: user.username, role: user.role, jti: uniqueTokenId }, 
         SECRET_KEY, 
         { expiresIn: '1m', algorithm: 'HS256' }
     );
 
     const refreshToken = jwt.sign(
-        { id: user.id, username: user.username, role: user.role }, 
+        { id: user.id, username: user.username, role: user.role, jti: crypto.randomUUID() }, 
         REFRESH_SECRET_KEY, 
         { expiresIn: '7d', algorithm: 'HS256' }
     );
@@ -55,7 +59,7 @@ app.post('/api/refresh-token', (req, res) => {
     jwt.verify(token, REFRESH_SECRET_KEY, (err, user) => {
         if (err) return res.status(403).json({ message: 'Refresh Token đã hết hạn' });
 
-        const newPayload = { id: user.id, username: user.username, role: user.role };
+        const newPayload = { id: user.id, username: user.username, role: user.role, jti: crypto.randomUUID() };
         
         const newAccessToken = jwt.sign(newPayload, SECRET_KEY, { expiresIn: '1m' });
         
@@ -63,11 +67,13 @@ app.post('/api/refresh-token', (req, res) => {
     });
 });
 
-app.post('/api/logout', (req, res) => {
+app.post('/api/logout', verifyToken, (req, res) => {
     const token = req.cookies.refreshToken;
-    
     refreshTokens = refreshTokens.filter(t => t !== token);
     res.clearCookie('refreshToken');
+
+    const tokenJti = req.user.jti;
+    revokedJtis.push(tokenJti);
     
     res.json({ message: 'Đăng xuất thành công, Refresh Token đã bị vô hiệu hóa!' });
 });
@@ -81,20 +87,19 @@ const verifyToken = (req, res, next) => {
             SECRET_KEY, 
             {algorithms: ['HS256']}
         );
+
+        if (revokedJtis.includes(decoded.jti)) {
+            return res.status(401).json({ message: 'Token này đã bị thu hồi (Bạn đã đăng xuất trước đó)' });
+        }
     
         req.user = decoded;
         next();
     } catch (err) {
-        return res.status(403).json({message: 'Token không hợp lệ.'});
+        return res.status(403).json({message: 'Token không hợp lệ hoặc đã hết hạn.'});
     }
 };
 
 app.use('/api/books', verifyToken);
-
-const requireAdmin = (req, res, next) => {
-    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Chỉ Admin mới có quyền thực hiện!' });
-    next();
-};
 
 function authorizeRole(role) {
   return (req, res, next) => {
@@ -153,4 +158,4 @@ app.delete('/api/books/:id', authorizeRole('admin'), (req, res) => {
     res.json({ message: 'Đã xóa sách thành công' });
 });
 
-app.listen(3000, () => console.log('Ver 0 is running on http://localhost:3000/api/books'));
+app.listen(3000, () => console.log('Ver 2 is running on http://localhost:3000/api/books'));
