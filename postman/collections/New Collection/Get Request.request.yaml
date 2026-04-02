@@ -1,5 +1,5 @@
 $kind: http-request
 name: Get Request
-url: http://localhost:3000/api/books
+url: http://127.0.0.1:5000/books/borrowed_books
 method: GET
 order: 1772736327351

@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/tranphuongkhanh/2526II_INT3505_1#readme",
   "dependencies": {
-    "express": "^5.2.1"
+    "bcryptjs": "^3.0.3",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3"
   }
 }
