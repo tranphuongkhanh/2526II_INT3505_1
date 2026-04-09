@@ -1,0 +1,278 @@
+﻿{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Book Management API",
+    "version": "1.0.0",
+    "description": "API quß║ún l├╜ s├ích cho ph├⌐p lß║Ñy th├┤ng tin s├ích, lß║Ñy s├ích theo ID, th├¬m s├ích mß╗¢i, cß║¡p nhß║¡t v├á x├│a s├ích."
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:5000/"
+    }
+  ],
+  "paths": {
+    "/books": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Book"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Lß║Ñy danh s├ích tß║Ñt cß║ú s├ích",
+        "operationId": "GET_books"
+      },
+      "post": {
+        "responses": {
+          "201": {
+            "description": "S├ích ─æ╞░ß╗úc tß║ío th├ánh c├┤ng"
+          },
+          "400": {
+            "description": "Dß╗» liß╗çu ─æß║ºu v├áo kh├┤ng hß╗úp lß╗ç",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Dß╗» liß╗çu kh├┤ng hß╗úp lß╗ç",
+                  "errors": [
+                    "status phß║úi l├á 'available' hoß║╖c 'borrowed'"
+                  ]
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "Th├¬m s├ích mß╗¢i",
+        "operationId": "POST_books",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookInput"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/books/{id}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Book"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kh├┤ng t├¼m thß║Ñy s├ích",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Kh├┤ng t├¼m thß║Ñy s├ích vß╗¢i ID n├áy"
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "Lß║Ñy th├┤ng tin s├ích theo ID",
+        "operationId": "GET_books-id"
+      },
+      "put": {
+        "responses": {
+          "200": {
+            "description": "Cß║¡p nhß║¡t th├ánh c├┤ng"
+          },
+          "400": {
+            "description": "Dß╗» liß╗çu ─æß║ºu v├áo kh├┤ng hß╗úp lß╗ç",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kh├┤ng t├¼m thß║Ñy s├ích",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "Cß║¡p nhß║¡t th├┤ng tin s├ích theo ID",
+        "operationId": "PUT_books-id",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookInput"
+              }
+            }
+          },
+          "required": true
+        }
+      },
+      "delete": {
+        "responses": {
+          "204": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "message": "X├│a th├ánh c├┤ng"
+                  },
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kh├┤ng t├¼m thß║Ñy s├ích",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "X├│a s├ích theo ID",
+        "operationId": "DELETE_books-id"
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          },
+          "description": "ID cß╗ºa s├ích"
+        }
+      ]
+    }
+  },
+  "components": {
+    "schemas": {
+      "Book": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "available",
+              "borrowed"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "author",
+          "status"
+        ]
+      },
+      "BookInput": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "available",
+              "borrowed"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "author",
+          "status"
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "success",
+          "message"
+        ]
+      }
+    },
+    "responses": {},
+    "parameters": {},
+    "examples": {},
+    "requestBodies": {},
+    "headers": {},
+    "securitySchemes": {},
+    "links": {},
+    "callbacks": {}
+  }
+}

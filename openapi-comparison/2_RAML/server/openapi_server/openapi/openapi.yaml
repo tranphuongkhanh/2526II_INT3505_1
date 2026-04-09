@@ -1,0 +1,237 @@
+openapi: 3.0.0
+info:
+  description: "API quß║ún l├╜ s├ích cho ph├⌐p lß║Ñy th├┤ng tin s├ích, lß║Ñy s├ích\
+    \ theo ID, th├¬m s├ích mß╗¢i, cß║¡p nhß║¡t v├á x├│a s├ích."
+  title: Book Management API
+  version: 1.0.0
+servers:
+- url: http://127.0.0.1:5000/
+paths:
+  /books:
+    get:
+      description: Lß║Ñy danh s├ích tß║Ñt cß║ú s├ích
+      operationId: g_et_books
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Book"
+                type: array
+          description: ""
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+    post:
+      description: Th├¬m s├ích mß╗¢i
+      operationId: p_ost_books
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookInput"
+        required: true
+      responses:
+        "201":
+          description: S├ích ─æ╞░ß╗úc tß║ío th├ánh c├┤ng
+        "400":
+          content:
+            application/json:
+              example:
+                success: false
+                message: Dß╗» liß╗çu kh├┤ng hß╗úp lß╗ç
+                errors:
+                - status phß║úi l├á 'available' hoß║╖c 'borrowed'
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Dß╗» liß╗çu ─æß║ºu v├áo kh├┤ng hß╗úp lß╗ç
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+  /books/{id}:
+    delete:
+      description: X├│a s├ích theo ID
+      operationId: d_elete_books_id
+      parameters:
+      - description: ID cß╗ºa s├ích
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "204":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DELETE_books_id_204_response"
+          description: ""
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Kh├┤ng t├¼m thß║Ñy s├ích
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+    get:
+      description: Lß║Ñy th├┤ng tin s├ích theo ID
+      operationId: g_et_books_id
+      parameters:
+      - description: ID cß╗ºa s├ích
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+          description: ""
+        "404":
+          content:
+            application/json:
+              example:
+                success: false
+                message: Kh├┤ng t├¼m thß║Ñy s├ích vß╗¢i ID n├áy
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Kh├┤ng t├¼m thß║Ñy s├ích
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+    put:
+      description: Cß║¡p nhß║¡t th├┤ng tin s├ích theo ID
+      operationId: p_ut_books_id
+      parameters:
+      - description: ID cß╗ºa s├ích
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookInput"
+        required: true
+      responses:
+        "200":
+          description: Cß║¡p nhß║¡t th├ánh c├┤ng
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Dß╗» liß╗çu ─æß║ºu v├áo kh├┤ng hß╗úp lß╗ç
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Kh├┤ng t├¼m thß║Ñy s├ích
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+components:
+  callbacks: {}
+  examples: {}
+  headers: {}
+  links: {}
+  parameters: {}
+  requestBodies: {}
+  responses: {}
+  schemas:
+    Book:
+      example:
+        author: author
+        id: 0
+        title: title
+        status: available
+      properties:
+        id:
+          title: id
+          type: integer
+        title:
+          title: title
+          type: string
+        author:
+          title: author
+          type: string
+        status:
+          enum:
+          - available
+          - borrowed
+          title: status
+          type: string
+      required:
+      - author
+      - status
+      - title
+      title: Book
+      type: object
+    BookInput:
+      example:
+        author: author
+        title: title
+        status: available
+      properties:
+        title:
+          title: title
+          type: string
+        author:
+          title: author
+          type: string
+        status:
+          enum:
+          - available
+          - borrowed
+          title: status
+          type: string
+      required:
+      - author
+      - status
+      - title
+      title: BookInput
+      type: object
+    Error:
+      example:
+        success: true
+        message: message
+        errors:
+        - errors
+        - errors
+      properties:
+        success:
+          title: success
+          type: boolean
+        message:
+          title: message
+          type: string
+        errors:
+          items:
+            type: string
+          title: errors
+          type: array
+      required:
+      - message
+      - success
+      title: Error
+      type: object
+    DELETE_books_id_204_response:
+      example:
+        success: true
+        message: X├│a th├ánh c├┤ng
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required:
+      - message
+      - success
+      title: DELETE_books_id_204_response
+      type: object
+  securitySchemes: {}
