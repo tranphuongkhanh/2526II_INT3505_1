@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 const Service = require('./Service');
+const Product = require('../models/Product');
 
 /**
 * Tạo sản phẩm mới
@@ -10,13 +11,17 @@ const Service = require('./Service');
 const createProduct = ({ product }) => new Promise(
   async (resolve, reject) => {
     try {
-      resolve(Service.successResponse({
-        product,
-      }));
+      const newProduct = new Product(product);
+      const savedProduct = await newProduct.save();
+
+      resolve(Service.successResponse(
+        savedProduct, 
+        201
+      ));
     } catch (e) {
       reject(Service.rejectResponse(
-        e.message || 'Invalid input',
-        e.status || 405,
+        e.message || 'Lỗi khi tạo sản phẩm',
+        e.status || 500,
       ));
     }
   },
@@ -30,13 +35,19 @@ const createProduct = ({ product }) => new Promise(
 const deleteProduct = ({ id }) => new Promise(
   async (resolve, reject) => {
     try {
+      const deletedProduct = await Product.findByIdAndDelete(id);
+      
+      if (!deletedProduct) {
+        return reject(Service.rejectResponse('Không tìm thấy sản phẩm để xóa', 404));
+      }
+
       resolve(Service.successResponse({
-        id,
-      }));
+        message: 'Đã xóa sản phẩm thành công',
+      }, 200));
     } catch (e) {
       reject(Service.rejectResponse(
-        e.message || 'Invalid input',
-        e.status || 405,
+        e.message || 'Lỗi khi xóa sản phẩm',
+        e.status || 500,
       ));
     }
   },
@@ -49,12 +60,16 @@ const deleteProduct = ({ id }) => new Promise(
 const getAllProducts = () => new Promise(
   async (resolve, reject) => {
     try {
-      resolve(Service.successResponse({
-      }));
+      const products = await Product.find();
+      
+      resolve(Service.successResponse(
+        products, 
+        200
+      ));
     } catch (e) {
       reject(Service.rejectResponse(
-        e.message || 'Invalid input',
-        e.status || 405,
+        e.message || 'Lỗi khi lấy danh sách sản phẩm',
+        e.status || 500,
       ));
     }
   },
@@ -68,13 +83,20 @@ const getAllProducts = () => new Promise(
 const getProductById = ({ id }) => new Promise(
   async (resolve, reject) => {
     try {
-      resolve(Service.successResponse({
-        id,
-      }));
+      const product = await Product.findById(id);
+      
+      if (!product) {
+        return reject(Service.rejectResponse('Không tìm thấy sản phẩm', 404));
+      }
+      
+      resolve(Service.successResponse(
+        product, 
+        200
+      ));
     } catch (e) {
       reject(Service.rejectResponse(
-        e.message || 'Invalid input',
-        e.status || 405,
+        e.message || 'Lỗi khi truy vấn sản phẩm',
+        e.status || 500,
       ));
     }
   },
@@ -89,14 +111,21 @@ const getProductById = ({ id }) => new Promise(
 const updateProduct = ({ id, product }) => new Promise(
   async (resolve, reject) => {
     try {
-      resolve(Service.successResponse({
-        id,
-        product,
-      }));
+      // { new: true } đảm bảo Mongoose trả về document SAU KHI đã cập nhật thay vì dữ liệu cũ
+      const updatedProduct = await Product.findByIdAndUpdate(id, product, { new: true });
+      
+      if (!updatedProduct) {
+        return reject(Service.rejectResponse('Không tìm thấy sản phẩm để cập nhật', 404));
+      }
+      
+      resolve(Service.successResponse(
+        updatedProduct, 
+        200
+      ));
     } catch (e) {
       reject(Service.rejectResponse(
-        e.message || 'Invalid input',
-        e.status || 405,
+        e.message || 'Lỗi khi cập nhật sản phẩm',
+        e.status || 500,
       ));
     }
   },
