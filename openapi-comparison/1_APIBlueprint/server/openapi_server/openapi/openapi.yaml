@@ -1,0 +1,316 @@
+openapi: 3.0.1
+info:
+  description: "API quản lý sách cho phép lấy thông tin sách, lấy sách theo ID, thê\
+    m sách mới, cập nhật và xóa sách."
+  title: Book Management API
+  version: ""
+servers:
+- url: http://127.0.0.1:5000/
+tags:
+- name: Books
+paths:
+  /books:
+    get:
+      operationId: ly_danh_sch_tt_c_sch
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+              - id: 1
+                title: Clean Code
+                author: Robert Martin
+                status: available
+              schema:
+                items:
+                  type: object
+                type: array
+          description: OK
+      summary: Lấy danh sách tất cả sách
+      tags:
+      - Books
+      x-openapi-router-controller: openapi_server.controllers.books_controller
+    post:
+      operationId: thm_sch_mi
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Th_m_s_ch_m_i_request"
+        required: false
+      responses:
+        "201":
+          content: {}
+          description: Created
+        "400":
+          content:
+            application/json:
+              example:
+                success: false
+                message: Đã xảy ra lỗi
+                errors:
+                - title không được để trống
+                - isbn không hợp lệ
+              schema:
+                $ref: "#/components/schemas/Th_m_s_ch_m_i_400_response"
+          description: Bad Request
+      summary: Thêm sách mới
+      tags:
+      - Books
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: openapi_server.controllers.books_controller
+  /books/{id}:
+    delete:
+      operationId: xa_sch_theo_id
+      parameters:
+      - description: ID của sách
+        example: "1"
+        in: path
+        name: id
+        required: true
+        schema:
+          type: number
+      responses:
+        "204":
+          content:
+            application/json:
+              example:
+                success: true
+                message: Xóa thành công
+              schema:
+                $ref: "#/components/schemas/X_a_s_ch_theo_ID_204_response"
+          description: No Content
+        "404":
+          content:
+            application/json:
+              example:
+                success: false
+                message: Đã xảy ra lỗi
+                errors:
+                - title không được để trống
+                - isbn không hợp lệ
+              schema:
+                $ref: "#/components/schemas/Th_m_s_ch_m_i_400_response"
+          description: Not Found
+      summary: Xóa sách theo ID
+      tags:
+      - Books
+      x-openapi-router-controller: openapi_server.controllers.books_controller
+    get:
+      operationId: ly_thng_tin_sch_theo_id
+      parameters:
+      - description: ID của sách
+        example: "1"
+        in: path
+        name: id
+        required: true
+        schema:
+          type: number
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                id: 1
+                title: Clean Code
+                author: Robert Martin
+                status: available
+              schema:
+                $ref: "#/components/schemas/L_y_th_ng_tin_s_ch_theo_ID_200_response"
+          description: OK
+        "404":
+          content:
+            application/json:
+              example:
+                success: false
+                message: Đã xảy ra lỗi
+                errors:
+                - title không được để trống
+                - isbn không hợp lệ
+              schema:
+                $ref: "#/components/schemas/Th_m_s_ch_m_i_400_response"
+          description: Not Found
+      summary: Lấy thông tin sách theo ID
+      tags:
+      - Books
+      x-openapi-router-controller: openapi_server.controllers.books_controller
+    put:
+      operationId: cp_nht_thng_tin_sch_theo_id
+      parameters:
+      - description: ID của sách
+        example: "1"
+        in: path
+        name: id
+        required: true
+        schema:
+          type: number
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Th_m_s_ch_m_i_request"
+        required: false
+      responses:
+        "200":
+          content: {}
+          description: OK
+        "400":
+          content:
+            application/json:
+              example:
+                success: false
+                message: Đã xảy ra lỗi
+                errors:
+                - title không được để trống
+                - isbn không hợp lệ
+              schema:
+                $ref: "#/components/schemas/Th_m_s_ch_m_i_400_response"
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              example:
+                success: false
+                message: Đã xảy ra lỗi
+                errors:
+                - title không được để trống
+                - isbn không hợp lệ
+              schema:
+                $ref: "#/components/schemas/Th_m_s_ch_m_i_400_response"
+          description: Not Found
+      summary: Cập nhật thông tin sách theo ID
+      tags:
+      - Books
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: openapi_server.controllers.books_controller
+components:
+  schemas:
+    Books Collection:
+      type: object
+    Book:
+      properties:
+        id:
+          example: 1.0
+          type: number
+        title:
+          example: Clean Code
+          type: string
+        author:
+          example: Robert Martin
+          type: string
+        status:
+          enum:
+          - available
+          - borrowed
+          type: string
+      type: object
+    BookInput:
+      properties:
+        title:
+          example: Clean Code
+          type: string
+        author:
+          example: Robert Martin
+          type: string
+        status:
+          enum:
+          - available
+          - borrowed
+          type: string
+      required:
+      - author
+      - status
+      - title
+      type: object
+    Error:
+      properties:
+        success:
+          type: boolean
+        message:
+          example: Đã xảy ra lỗi
+          type: string
+        errors:
+          items:
+            type: object
+          type: array
+      type: object
+    Th_m_s_ch_m_i_request:
+      example:
+        title: Clean Code
+        author: Robert Martin
+        status: available
+      properties:
+        title:
+          type: string
+        author:
+          type: string
+        status:
+          enum:
+          - available
+          - borrowed
+          type: string
+      required:
+      - author
+      - status
+      - title
+      title: Th_m_s_ch_m_i_request
+      type: object
+    Th_m_s_ch_m_i_400_response:
+      example:
+        success: true
+        message: message
+        errors:
+        - "{}"
+        - "{}"
+      properties:
+        success:
+          title: success
+          type: boolean
+        message:
+          title: message
+          type: string
+        errors:
+          items:
+            type: object
+          title: errors
+          type: array
+      title: Th_m_s_ch_m_i_400_response
+      type: object
+    L_y_th_ng_tin_s_ch_theo_ID_200_response:
+      example:
+        author: author
+        id: 0.8008281904610115
+        title: title
+        status: available
+      properties:
+        id:
+          title: id
+          type: number
+        title:
+          title: title
+          type: string
+        author:
+          title: author
+          type: string
+        status:
+          enum:
+          - available
+          - borrowed
+          title: status
+          type: string
+      title: L_y_th_ng_tin_s_ch_theo_ID_200_response
+      type: object
+    X_a_s_ch_theo_ID_204_response:
+      example:
+        success: true
+        message: message
+      properties:
+        success:
+          title: success
+          type: boolean
+        message:
+          title: message
+          type: string
+      title: X_a_s_ch_theo_ID_204_response
+      type: object
+x-original-swagger-version: "2.0"
