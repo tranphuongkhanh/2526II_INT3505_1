@@ -1,0 +1,133 @@
+openapi: 3.0.0
+info:
+  description: "API quản lý sản phẩm cho phép lấy thông tin sản phẩm, lấy sản phẩ\
+    m theo ID, thêm sản phẩm mới, cập nhật và xóa sản phẩm."
+  title: Product API
+  version: 1.0.0
+servers:
+- url: /
+tags:
+- description: Các thao tác quản lý sản phẩm
+  name: Products
+paths:
+  /products:
+    get:
+      operationId: getAllProducts
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Product"
+                type: array
+          description: Lấy danh sách thành công
+      summary: Lấy tất cả sản phẩm
+      tags:
+      - Products
+      x-eov-operation-handler: controllers/ProductsController
+    post:
+      operationId: createProduct
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+        required: true
+      responses:
+        "201":
+          description: Đã tạo sản phẩm
+      summary: Tạo sản phẩm mới
+      tags:
+      - Products
+      x-eov-operation-handler: controllers/ProductsController
+  /products/{id}:
+    delete:
+      operationId: deleteProduct
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: Đã xóa thành công
+        "404":
+          description: Không tìm thấy sản phẩm
+      summary: Xóa sản phẩm
+      tags:
+      - Products
+      x-eov-operation-handler: controllers/ProductsController
+    get:
+      operationId: getProductById
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: Lấy sản phẩm thành công
+        "404":
+          description: Không tìm thấy sản phẩm
+      summary: Lấy sản phẩm theo ID
+      tags:
+      - Products
+      x-eov-operation-handler: controllers/ProductsController
+    put:
+      operationId: updateProduct
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+        required: true
+      responses:
+        "200":
+          description: Đã cập nhật thành công
+        "404":
+          description: Không tìm thấy sản phẩm
+      summary: Cập nhật sản phẩm
+      tags:
+      - Products
+      x-eov-operation-handler: controllers/ProductsController
+components:
+  schemas:
+    Product:
+      example:
+        price: 15000000
+        name: Laptop Acer Aspire Lite 15
+        description: Laptop văn phòng
+        id: 0
+        stock: 50
+      properties:
+        id:
+          readOnly: true
+          type: integer
+        name:
+          example: Laptop Acer Aspire Lite 15
+          type: string
+        price:
+          example: 15000000
+          type: number
+        description:
+          example: Laptop văn phòng
+          type: string
+        stock:
+          example: 50
+          type: integer
+      type: object

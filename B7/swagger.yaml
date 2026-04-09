@@ -1,0 +1,116 @@
+openapi: 3.0.0
+
+info:
+  title: Product API
+  description: API quản lý sản phẩm cho phép lấy thông tin sản phẩm, lấy sản phẩm theo ID, thêm sản phẩm mới, cập nhật và xóa sản phẩm.
+  version: 1.0.0
+
+tags:
+  - name: Products
+    description: Các thao tác quản lý sản phẩm
+
+paths:
+  /products:
+    get:
+      tags:
+        - Products
+      summary: Lấy tất cả sản phẩm
+      operationId: getAllProducts
+      responses:
+        '200':
+          description: Lấy danh sách thành công
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+    post:
+      tags:
+        - Products
+      summary: Tạo sản phẩm mới
+      operationId: createProduct
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '201':
+          description: Đã tạo sản phẩm
+  /products/{id}:
+    get:
+      tags:
+        - Products
+      summary: Lấy sản phẩm theo ID
+      operationId: getProductById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lấy sản phẩm thành công
+        '404':
+          description: Không tìm thấy sản phẩm
+    put:
+      tags:
+        - Products
+      summary: Cập nhật sản phẩm
+      operationId: updateProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '200':
+          description: Đã cập nhật thành công
+        '404':
+          description: Không tìm thấy sản phẩm
+    delete:
+      tags:
+        - Products
+      summary: Xóa sản phẩm
+      operationId: deleteProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Đã xóa thành công
+        '404':
+          description: Không tìm thấy sản phẩm
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          example: "Laptop Acer Aspire Lite 15"
+        price:
+          type: number
+          example: 15000000
+        description:
+          type: string
+          example: "Laptop văn phòng"
+        stock:
+          type: integer
+          example: 50
