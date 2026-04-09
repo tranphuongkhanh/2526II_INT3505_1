@@ -50,7 +50,7 @@ paths:
         name: id
         required: true
         schema:
-          type: integer
+          type: string
         style: simple
       responses:
         "200":
@@ -69,7 +69,7 @@ paths:
         name: id
         required: true
         schema:
-          type: integer
+          type: string
         style: simple
       responses:
         "200":
@@ -88,7 +88,7 @@ paths:
         name: id
         required: true
         schema:
-          type: integer
+          type: string
         style: simple
       requestBody:
         content:

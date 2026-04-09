@@ -8,10 +8,10 @@ const Product = require('../models/Product');
 * product Product 
 * no response value expected for this operation
 * */
-const createProduct = ({ product }) => new Promise(
+const createProduct = ({ body }) => new Promise(
   async (resolve, reject) => {
     try {
-      const newProduct = new Product(product);
+      const newProduct = new Product(body);
       const savedProduct = await newProduct.save();
 
       resolve(Service.successResponse(
@@ -108,11 +108,11 @@ const getProductById = ({ id }) => new Promise(
 * product Product 
 * no response value expected for this operation
 * */
-const updateProduct = ({ id, product }) => new Promise(
+const updateProduct = ({ id, body }) => new Promise(
   async (resolve, reject) => {
     try {
       // { new: true } đảm bảo Mongoose trả về document SAU KHI đã cập nhật thay vì dữ liệu cũ
-      const updatedProduct = await Product.findByIdAndUpdate(id, product, { new: true });
+      const updatedProduct = await Product.findByIdAndUpdate(id, body, { new: true });
       
       if (!updatedProduct) {
         return reject(Service.rejectResponse('Không tìm thấy sản phẩm để cập nhật', 404));
