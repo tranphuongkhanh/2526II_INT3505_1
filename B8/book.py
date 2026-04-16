@@ -1,3 +1,5 @@
+import math
+
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
@@ -10,7 +12,23 @@ books = [
 
 @app.route("/books", methods=["GET"])
 def get_books():
-    return jsonify(books), 200
+    # return jsonify(books), 200
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    start = (page - 1) * per_page
+    end = start + per_page
+    paginated_books = books[start:end]
+
+    response = {
+        "metadata": {
+            "total_records": len(books),
+            "current_page": page,
+            "per_page": per_page,
+            "total_pages": math.ceil(len(books) / per_page)
+        },
+        "data": paginated_books
+    }
+    return jsonify(response), 200
 
 @app.route("/books", methods=["POST"])
 def add_book():
