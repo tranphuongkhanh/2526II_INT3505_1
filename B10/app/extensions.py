@@ -8,6 +8,6 @@ metrics = PrometheusMetrics.for_app_factory()
 limiter = Limiter(
     key_func=get_remote_address, 
     app=None, 
-    default_limits=["100 per 15 minute"],
+    default_limits=["10 per 1 minute"],
     storage_uri="memory://"
 )
