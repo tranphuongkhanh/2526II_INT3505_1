@@ -3,3 +3,5 @@
 /B5/instance
 B7/product-service/combined.log
 B10/logs/combined.log
+/postman
+*.log
