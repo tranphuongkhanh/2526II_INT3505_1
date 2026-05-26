@@ -2,6 +2,30 @@ from flask import request, jsonify
 from datetime import datetime
 from app import app, db
 from app.models import Reader, Book, BorrowRecord
+from sqlalchemy import desc, asc
+
+def apply_sorting(query, model, sort_param, allowed_fields):
+    """
+    Hàm helper phân tích chuỗi sort và áp dụng vào SQLAlchemy Query.
+    Ví dụ sort_param: "-membership_date,name"
+    """
+    if not sort_param:
+        return query
+    
+    sort_fields = sort_param.split(',')
+    for field in sort_fields:
+        is_desc = field.startswith('-')
+        clean_field = field.lstrip('-')
+        
+        # Chỉ áp dụng sort nếu field hợp lệ để tránh lỗi bảo mật
+        if clean_field in allowed_fields:
+            column = getattr(model, clean_field)
+            if is_desc:
+                query = query.order_by(desc(column))
+            else:
+                query = query.order_by(asc(column))
+                
+    return query
 
 # Reader API Endpoints
 
@@ -9,6 +33,7 @@ from app.models import Reader, Book, BorrowRecord
 def get_readers():
     offset = request.args.get('offset', 0, type=int)
     limit = request.args.get('limit', 10, type=int)
+    sort = request.args.get('sort', type=str)
 
     name = request.args.get('name', type=str)
     email = request.args.get('email', type=str)
@@ -22,6 +47,9 @@ def get_readers():
         query = query.filter(Reader.email.ilike(f'%{email}%'))
     if phone:
         query = query.filter(Reader.phone.ilike(f'%{phone}%'))
+
+    allowed_sort_fields = ['id', 'name', 'email', 'membership_date']
+    query = apply_sorting(query, Reader, sort, allowed_sort_fields)
         
     total = query.count()
     
@@ -83,6 +111,7 @@ def delete_reader(id):
 def get_books():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
+    sort = request.args.get('sort', type=str)
 
     isbn = request.args.get('isbn', type=str)
     title = request.args.get('title', type=str)
@@ -96,6 +125,9 @@ def get_books():
         query = query.filter(Book.title.ilike(f'%{title}%'))
     if author:
         query = query.filter(Book.author.ilike(f'%{author}%'))
+
+    allowed_sort_fields = ['id', 'title', 'total_copies', 'available_copies', 'author']
+    query = apply_sorting(query, Book, sort, allowed_sort_fields)
         
     paginated = query.paginate(page=page, per_page=per_page, error_out=False)
 
